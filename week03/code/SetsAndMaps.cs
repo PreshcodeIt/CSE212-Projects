@@ -22,7 +22,26 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        HashSet<string> seen = new HashSet<string>();
+        List<string> result = new List<string>();
+
+        foreach (string word in words)
+        {
+            if (word.Length != 2 || word[0] == word[1])
+                continue;
+
+            string reversed = $"{word[1]}{word[0]}";
+
+            if (seen.Contains(reversed))
+            {
+                result.Add($"{reversed} & {word}");
+            }
+            else
+            {
+                seen.Add(word);
+            }
+        }
+        return result.ToArray();
     }
 
     /// <summary>
@@ -43,6 +62,17 @@ public static class SetsAndMaps
         {
             var fields = line.Split(",");
             // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length >= 4)
+            {
+                string degree = fields[3].Trim();
+                if (!string.IsNullOrEmpty(degree))
+                {
+                    if (degrees.ContainsKey(degree))
+                        degrees[degree]++;
+                    else
+                        degrees[degree] = 1;
+                }
+            }
         }
 
         return degrees;
@@ -67,8 +97,34 @@ public static class SetsAndMaps
     public static bool IsAnagram(string word1, string word2)
     {
         // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        string clean1 = word1.Replace(" ", "").ToLower();
+        string clean2 = word2.Replace(" ", "").ToLower();
+
+        if (clean1.Length != clean2.Length)
+            return false;
+
+        Dictionary<char, int> freq = new Dictionary<char, int>();
+        foreach (char c in clean1)
+        {
+            if (freq.ContainsKey(c))
+                freq[c]++;
+            else
+                freq[c] = 1;
+        }
+        foreach (char c in clean2)
+        {
+            if (!freq.ContainsKey(c))
+                return false;
+
+            freq[c]--;
+
+            if (freq[c] < 0)
+                return false;
+        }
+        return true;
     }
+
+
 
     /// <summary>
     /// This function will read JSON (Javascript Object Notation) data from the 
@@ -101,6 +157,26 @@ public static class SetsAndMaps
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
         // 3. Return an array of these string descriptions.
-        return [];
+
+   // Handle nulls just in case
+    if (featureCollection?.Features == null)
+        return Array.Empty<string>();
+
+    var results = new List<string>();
+
+    foreach (var feature in featureCollection.Features)
+    {
+        var place = feature.Properties?.Place ?? "Unknown location";
+        var mag = feature.Properties?.Mag?.ToString("0.##") ?? "N/A";
+        results.Add($"{place} - Mag {mag}");
     }
+
+
+
+        return results.ToArray();
+    }
+
+
+
+
 }
